@@ -20,7 +20,7 @@ from face_tracking.tracker.byte_tracker import BYTETracker
 from face_tracking.tracker.visualize import plot_tracking
 import requests
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, Optional
 
 # Deepgram imports
@@ -242,17 +242,19 @@ class DeepgramSpeechRecognizer:
                 speaker_label = f"Speaker {speaker_id}" if speaker_id is not None else None
 
             text_value = transcript if not speaker_label else f"{speaker_label}, {transcript}"
-            now_utc = datetime.now(timezone.utc)
+            # Indian Standard Time (IST) is UTC+5:30
+            ist_timezone = timezone(timedelta(hours=5, minutes=30))
+            now_ist = datetime.now(ist_timezone)
             conversation_entry = {
                 "text": text_value,
-                "timestamp": now_utc.replace(tzinfo=None).isoformat()
+                "timestamp": now_ist.replace(tzinfo=None).isoformat()
             }
 
             result = self.collection.update_one(
                 {"name": self.current_person},
                 {
                     "$push": {"conversation_data": conversation_entry},
-                    "$set": {"updated_at": now_utc.isoformat()}
+                    "$set": {"updated_at": now_ist.isoformat()}
                 }
             )
 
