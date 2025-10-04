@@ -221,7 +221,7 @@ class DeepgramSpeechRecognizer:
     def _store_transcript(self, speaker_id, transcript):
         """Store transcript in MongoDB."""
         try:
-            if not self.current_person or not self.collection:
+            if not self.current_person or self.collection is None:
                 return
 
             try:
