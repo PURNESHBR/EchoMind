@@ -28,8 +28,8 @@ function Summary() {
           return;
         }
 
-        //const response = await axios.get(`http://localhost:5000/api/known-persons/${patientId}`);
-        const response = await axios.get(`https://echomind-6.onrender.com/api/known-persons/${patientId}`);
+        const response = await axios.get(`http://localhost:5000/api/known-persons/${patientId}`);
+        //const response = await axios.get(`https://echomind-6.onrender.com/api/known-persons/${patientId}`);
 
         if (response.data.success) {
           setKnownPersons(response.data.known_persons || []);
@@ -69,8 +69,8 @@ function Summary() {
       setError(null);
       setSummaryData(null);
 
-    /*  const response = await axios.get('http://localhost:5000/api/summarize-conversation', {*/
-      const response = await axios.get('https://echomind-6.onrender.com/api/summarize-conversation', {
+      const response = await axios.get('http://localhost:5000/api/summarize-conversation', {
+     /* const response = await axios.get('https://echomind-6.onrender.com/api/summarize-conversation', {*/
         params: {
           patient_id: patientId,
           known_person_id: selectedPersonId,
@@ -98,8 +98,8 @@ function Summary() {
       setError(null);
       setSummaryData(null);
 
-     /* const response = await axios.get('http://localhost:5000/api/summarize-all-conversations', {*/
-      const response = await axios.get('https://echomind-6.onrender.com/api/summarize-all-conversations', {
+     const response = await axios.get('http://localhost:5000/api/summarize-all-conversations', {
+      /*const response = await axios.get('https://echomind-6.onrender.com/api/summarize-all-conversations', {*/
         params: {
           patient_id: patientId,
           known_person_id: selectedPersonId
