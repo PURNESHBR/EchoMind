@@ -11,6 +11,7 @@ const resources = {
       medicationReminder: "Medication Reminder",
       sos: "SOS",
       games: "Games",
+      kannada: "ಕನ್ನಡ",
       simonSays: "Simon Says",
       pictureMatch: "Picture Match",
       wordScramble: "Word Scramble",
