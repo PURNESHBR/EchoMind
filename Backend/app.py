@@ -64,7 +64,7 @@ app = Flask(__name__)
 # We'll use these and ensure both 5173 and 5174 origins are allowed.
 CORS(app, supports_credentials=True, resources={
     r"/api/*": {
-        "origins": ["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "https://echo-mind-gules.vercel.app", "https://echomind-6.onrender.com", "https://slzvr7mc-8000.inc1.devtunnels.ms"],
+        "origins": ["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "https://echo-mind-gules.vercel.app", "https://echomind-6.onrender.com", "https://3bttfh6b-8000.inc1.devtunnels.ms"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
@@ -75,7 +75,7 @@ app.json_encoder = MongoJSONEncoder
 os.environ["IMGBB_API_KEY"] = os.getenv("IMGBB_API_KEY", "ae2817b2ebddd8b0160555cc377b8ff9")
 
 # Set Groq API key (you need to set this with your own key)
-os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY", "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")
+os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY", "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")
 
 # Initialize Groq client
 groq_client = groq.Groq(api_key=os.getenv("GROq_API_KEY"))
@@ -111,7 +111,7 @@ def send_email(to_email, subject, body):
     try:
         # Send email
         email_address = os.getenv("EMAIL_ADDRESS") or "echomind.reminder@gmail.com"
-        email_password = os.getenv("EMAIL_PASSWORD") or "amhd krsr pmnh cybq"
+        email_password = os.getenv("EMAIL_PASSWORD") or "vncx rkhh zqwv adbu"
 
         msg = MIMEMultipart()
         msg['From'] = email_address
@@ -286,7 +286,7 @@ def generate_summary(conversations, person_name):
 
         # Call Groq API for summarization
         response = groq_client.chat.completions.create(
-            model="llama3-70b-8192",  # Using Llama 3 70B model
+            model="llama-3.1-8b-instant",  # Using Llama 3 70B model
             messages=[
                 {"role": "system", "content": "You are a helpful assistant that summarizes conversations for patients with memory difficulties."},
                 {"role": "user", "content": prompt}

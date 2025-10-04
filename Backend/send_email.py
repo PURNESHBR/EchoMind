@@ -109,7 +109,7 @@ def send_sos_email(recipient_name, recipient_email, user_name, location, timesta
     """
     # Get email credentials from environment variables
     sender_email = os.getenv("SENDER_EMAIL", "echomind.reminder@gmail.com")
-    app_password = os.getenv("APP_PASSWORD", "amhd krsr pmnh cybq")
+    app_password = os.getenv("APP_PASSWORD", "vncx rkhh zqwv adbu")
     
     # Create message
     msg = MIMEMultipart()
@@ -175,7 +175,7 @@ def send_email(to_email, subject, body):
     try:
         # Send email
         email_address = os.getenv("EMAIL_ADDRESS") or "echomind.reminder@gmail.com"
-        email_password = os.getenv("EMAIL_PASSWORD") or "amhd krsr pmnh cybq"
+        email_password = os.getenv("EMAIL_PASSWORD") or "vncx rkhh zqwv adbu"
 
         msg = MIMEMultipart()
         msg['From'] = email_address

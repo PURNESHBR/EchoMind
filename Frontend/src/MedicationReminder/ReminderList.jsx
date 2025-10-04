@@ -22,8 +22,8 @@ const ReminderList = ({ refreshTrigger }) => {
     setLoading(true);
     setError("");
     try {
-      //const response = await fetch("http://localhost:5000/api/medication-reminders");
-      const response = await fetch("https://echomind-6.onrender.com/api/medication-reminders");
+      const response = await fetch("http://localhost:5000/api/medication-reminders");
+      //const response = await fetch("https://echomind-6.onrender.com/api/medication-reminders");
       const result = await response.json();
       
       if (result.success) {

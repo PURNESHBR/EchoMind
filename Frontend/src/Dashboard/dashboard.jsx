@@ -82,11 +82,11 @@ function Dashboard({ patients, selectedPatient, loading, user }) {
     navigate("/sos");
   };
 
-  const toggleRecording = async () => {
+ const toggleRecording = async () => {
     try {
       const endpoint = isRecording
-        ? "https://slzvr7mc-8000.inc1.devtunnels.ms/stop"
-        : "https://slzvr7mc-8000.inc1.devtunnels.ms/recognize";
+        ? "https://3bttfh6b-8000.inc1.devtunnels.ms/stop"
+        : "https://3bttfh6b-8000.inc1.devtunnels.ms/recognize";
 
       console.log(`Calling endpoint: ${endpoint}`);
 
