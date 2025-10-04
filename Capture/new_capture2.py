@@ -21,7 +21,7 @@ from face_tracking.tracker.visualize import plot_tracking
 import requests
 import asyncio
 from datetime import datetime, timezone
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 # Deepgram imports
 try:
@@ -69,10 +69,17 @@ class DeepgramSpeechRecognizer:
         self.client = MongoClient(mongo_uri)
         self.db = self.client["alzheimers_db"]
         self.collection = self.db["contacts"]
+        self.speaker_aliases: Dict[int, str] = {}
+        self._current_person_context: Optional[Dict[str, Any]] = None
+        self.caregiver_name: Optional[str] = None
         
     def set_recognized_person(self, person_name):
         """Set the currently recognized person."""
         self.current_person = person_name
+        self.speaker_aliases.clear()
+        self._current_person_context = None
+        self.caregiver_name = None
+        self._load_person_context()
         
     def start(self):
         """Start the speech recognition in a separate thread."""
@@ -154,7 +161,8 @@ class DeepgramSpeechRecognizer:
                     if message.is_final:
                         # Store the transcript in MongoDB
                         self._store_transcript(speaker_id, transcript)
-                        print(f"{self.current_person}: {transcript}")
+                        display_name = self._resolve_speaker_display_name(speaker_id)
+                        print(f"{display_name}: {transcript}")
                         
                 connection.on(EventType.OPEN, on_open)
                 connection.on(EventType.CLOSE, on_close)
@@ -224,6 +232,9 @@ class DeepgramSpeechRecognizer:
             if not self.current_person or self.collection is None:
                 return
 
+            if self._current_person_context is None:
+                self._load_person_context()
+
             try:
                 speaker_index = int(speaker_id) + 1
                 speaker_label = f"Speaker {speaker_index}"
@@ -249,6 +260,48 @@ class DeepgramSpeechRecognizer:
                 print(f"Person '{self.current_person}' not found in the database.")
         except Exception as e:
             print(f"Error storing transcript: {e}")
+
+    def _load_person_context(self):
+        """Fetch and cache the current person's contact document."""
+        if self.collection is None or not self.current_person:
+            return
+
+        try:
+            self._current_person_context = self.collection.find_one({"name": self.current_person})
+        except Exception as exc:  # pragma: no cover - diagnostic log
+            print(f"Error loading person context: {exc}")
+            self._current_person_context = None
+
+        if self._current_person_context:
+            caregiver = (
+                self._current_person_context.get("user_name")
+                or self._current_person_context.get("caregiver_name")
+            )
+            if caregiver:
+                self.caregiver_name = caregiver
+
+    def _resolve_speaker_display_name(self, speaker_id: Optional[str]) -> str:
+        """Resolve a human-friendly speaker name for terminal output."""
+        if speaker_id is None:
+            return self.current_person or "Unknown speaker"
+
+        try:
+            idx = int(speaker_id)
+        except (TypeError, ValueError):
+            return str(speaker_id)
+
+        if idx == 0:
+            return self.current_person or "Speaker 1"
+
+        if idx == 1:
+            if not self.caregiver_name and self._current_person_context is None:
+                self._load_person_context()
+            return self.caregiver_name or "Speaker 2"
+
+        if idx not in self.speaker_aliases:
+            self.speaker_aliases[idx] = f"Speaker {idx + 1}"
+
+        return self.speaker_aliases[idx]
             
     def _require_sounddevice(self):
         """Check if sounddevice is available."""
