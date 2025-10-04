@@ -1904,6 +1904,112 @@ def delete_routine(routine_id):
         traceback.print_exc()
         return jsonify({'success': False, 'message': f'Failed to delete routine: {str(e)}'}), 500
 
+# Route for conversational chatbot
+@app.route('/api/chatbot/ask', methods=['POST'])
+def chatbot_ask():
+    """
+    Answer questions based on all conversations stored in the database.
+    Uses Groq AI to provide concise answers strictly based on stored conversation data.
+    """
+    try:
+        data = request.json
+        user_question = data.get('question', '').strip()
+        patient_id = data.get('patient_id')
+        
+        if not user_question:
+            return jsonify({'success': False, 'error': 'Question is required'}), 400
+        
+        if not patient_id:
+            return jsonify({'success': False, 'error': 'Patient ID is required'}), 400
+        
+        # Fetch all contacts with conversations for this patient
+        contacts = list(contacts_collection.find({'user_id': patient_id}))
+        
+        if not contacts:
+            return jsonify({
+                'success': True,
+                'answer': 'No conversation data found. Please have some conversations first before asking questions.'
+            })
+        
+        # Collect all conversations from all contacts
+        all_conversations = []
+        person_names = {}
+        
+        for contact in contacts:
+            person_name = contact.get('name', 'Unknown Person')
+            person_names[contact.get('_id')] = person_name
+            conversation_data = contact.get('conversation_data', [])
+            
+            for message in conversation_data:
+                all_conversations.append({
+                    'person': person_name,
+                    'text': message.get('text', ''),
+                    'timestamp': message.get('timestamp', '')
+                })
+        
+        if not all_conversations:
+            return jsonify({
+                'success': True,
+                'answer': 'No conversation data found. The contacts exist but no conversations have been recorded yet.'
+            })
+        
+        # Sort conversations by timestamp
+        all_conversations.sort(key=lambda x: x.get('timestamp', ''))
+        
+        # Format conversations for the AI prompt
+        formatted_conversations = "\n\n".join([
+            f"Conversation with {conv['person']} at {conv['timestamp']}:\n{conv['text']}"
+            for conv in all_conversations
+        ])
+        
+        # Create a prompt for the AI that emphasizes using only the provided data
+        prompt = f"""You are a helpful assistant for elderly people with memory difficulties. Your job is to answer questions STRICTLY based on the conversation data provided below. 
+
+IMPORTANT RULES:
+1. ONLY use information from the conversations provided below
+2. If the answer is not in the conversations, say "I don't have that information in the recorded conversations"
+3. Keep answers concise and simple (2-3 sentences maximum)
+4. Use simple language suitable for elderly people
+5. DO NOT make up, assume, or infer information that isn't explicitly in the conversations
+
+User's Question: {user_question}
+
+Recorded Conversations:
+{formatted_conversations}
+
+Please provide a concise answer based ONLY on the information in these conversations."""
+
+        # Call Groq API
+        response = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant that answers questions ONLY based on provided conversation data. Never make assumptions or provide information not in the conversations. Keep answers concise and simple for elderly users."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            max_tokens=200,
+            temperature=0.1  # Low temperature for more factual, less creative responses
+        )
+        
+        answer = response.choices[0].message.content.strip()
+        
+        return jsonify({
+            'success': True,
+            'answer': answer,
+            'conversation_count': len(all_conversations),
+            'people_involved': list(set([conv['person'] for conv in all_conversations]))
+        })
+        
+    except Exception as e:
+        print(f"Error in chatbot_ask: {str(e)}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': f'Failed to process question: {str(e)}'}), 500
+
 if __name__ == '__main__':
     try:
         print("Starting Flask server on http://localhost:5000")
