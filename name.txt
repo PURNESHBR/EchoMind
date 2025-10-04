@@ -1,0 +1,17 @@
+SENDER_EMAIL=echomind.reminder@gmail.com
+# App password for Gmail (not your regular password - generate an app password)
+APP_PASSWORD=vncx rkhh zqwv adbu
+
+# =====================================
+# TWILIO SMS CONFIGURATION
+# =====================================
+# Twilio Account SID - Get from Twilio Console
+TWILIO_ACCOUNT_SID=AC0d0e5ae71761143fc0aa43b060c2f8bf
+# Twilio Auth Token - Get from Twilio Console
+TWILIO_AUTH_TOKEN=8ebd27375b27a0bcab797c849d543a9b
+# Your Twilio phone number (in E.164 format, e.g., +1234567890)
+TWILIO_PHONE_NUMBER=+12232177226
+# Default recipient phone number for SMS notifications (in E.164 format)
+RECIPIENT_PHONE_NUMBER=+918979392188
+
+GROq_API_KEY=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
