@@ -161,7 +161,8 @@ Open two terminals:
 - **Team Members:** Shashank MS
 - **Team Members:** Utkarsh Saraswath
 - **Team Members:** Subhash Srinivas Reddy
-- **Team Members:** AP Saroon  
+- **Team Members:** AP Saroon
+- **Team Members:** Purnesh B R
 - **Institute:** Bangalore Institute of Technology  
 - **Theme:** Healthcare  
 
